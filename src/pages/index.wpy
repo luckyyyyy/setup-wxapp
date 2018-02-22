@@ -1,0 +1,99 @@
+<template>
+    <view class="user">
+        <view class="user-avatar">
+            <image   src="{{ user.avatar }}"></image>
+        </view>
+        <view class="user-info">
+            <view class="user-info-top">
+                <text class="user-info__name">{{ user.name }}</text>
+                <text class="user-info__title">科技达人{{follow.isFollow}}</text>
+            </view>
+            <text wx:if="{{ follow.isFollow }}" class="user-info-bottom user-info__desc">已与差评结识 147 天</text>
+            <text wx:else class="user-info-bottom user-info__desc">您没有关注差评哦</text>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import { connect } from 'wepy-redux';
+import { getUser, getFollow } from '@/store/reducers/user';
+
+@connect({
+    user(state) {
+        return state.user.user;
+    },
+    follow(state) {
+        return state.user.follow;
+    },
+}, {
+    getUser, getFollow
+})
+
+export default class Index extends wepy.page {
+    config = {
+        navigationBarTitleText: '我的差评生涯2'
+    }
+    async load() {
+        await this.methods.getFollow('chaping');
+        this.$apply();
+    }
+    onShareAppMessage(object) {
+        return {
+            title: '青阳魂',
+            path: '/pages/index',
+        }
+    }
+    async onLoad() {
+        await this.load();
+    }
+    async onPullDownRefresh() {
+        await this.load();
+        wepy.stopPullDownRefresh();
+    }
+}
+</script>
+
+<style lang="less">
+.user {
+    height: 200rpx;
+    display: flex;
+    background: #000;
+    flex-direction: row;
+    padding: 20rpx;
+    align-items: center;
+    box-sizing: border-box;
+    &-avatar {
+        margin-right: 30rpx;
+        image {
+            background-size: "cover";
+            width: 140rpx;
+            height: 140rpx;
+            border-radius: 50%;
+        }
+    }
+    &-info {
+        color: white;
+        display: flex;
+        flex-direction: column;
+        &-top {
+            display: flex;
+            align-items: center;
+        }
+        &__name {
+            font-size: 46rpx;
+        }
+        &__title {
+            margin-left: 20rpx;
+            background: rgb(255, 215, 0);
+            color: #ce0000;
+            padding: 1rpx 12rpx;
+            font-size: 22rpx;
+        }
+        &__desc {
+            color: #ffe;
+            font-size: 24rpx;
+        }
+    }
+}
+</style>

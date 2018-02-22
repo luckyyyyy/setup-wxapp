@@ -1,0 +1,66 @@
+<style lang="less">
+    @import 'style/weui/weui.less';
+</style>
+<script>
+import wepy from 'wepy';
+import { setStore } from 'wepy-redux';
+import initStore from '@/store';
+import { getUser } from '@/store/reducers/user';
+import { connect } from 'wepy-redux';
+import 'wepy-async-function';
+
+const store = initStore();
+setStore(store);
+
+/**
+ * App()
+ * @see https://mp.weixin.qq.com/debug/wxadoc/dev/framework/app-service/app.html
+ */
+export default class extends wepy.app {
+    /**
+     * 小程序config
+     * @see https://mp.weixin.qq.com/debug/wxadoc/dev/framework/config.html
+     */
+    config = {
+        pages: [
+            'pages/index'
+        ],
+        window: {
+            backgroundTextStyle: 'dark',
+            navigationBarBackgroundColor: '#000',
+            navigationBarTitleText: 'Wechat Mini App',
+            navigationBarTextStyle: '#fff',
+            enablePullDownRefresh: true
+        }
+    }
+
+    /**
+     * 获取登陆的用户信息
+     * @return {Promise}
+     */
+    async getProfileUser() {
+        const state = store.getState();
+        if (Object.keys(state.user.user).length === 0) {
+            await store.dispatch(getUser())
+        }
+        return Promise.resolve();
+    }
+
+    /**
+     * 构造函数
+     */
+    constructor () {
+        super();
+        this.use('requestfix');
+        this.use('promisify');
+    }
+
+    /**
+     * 小程序 onLaunch
+     * @param {object} opt
+     */
+    async onLaunch(opt) {
+        await this.getProfileUser();
+    }
+}
+</script>
