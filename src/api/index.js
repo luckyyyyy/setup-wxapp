@@ -182,15 +182,15 @@ export const BASE_URL = 'https://api.chaping.tv/api';
 const interceptors = {
     onRequest(req) {
         return new Promise(async (resolve, reject) => {
+            let token = getAuthorization();
             if (req.__params.ignoreToken !== true) {
-                let token = getAuthorization();
                 if (!token) {
                     await getUserInfo();
                     token = getAuthorization();
                 }
-                if (token) {
-                    req.header.Authorization = `Bearer ${token}`;
-                }
+            }
+            if (token) {
+                req.header.Authorization = `Bearer ${token}`;
             }
             resolve(req);
         })
